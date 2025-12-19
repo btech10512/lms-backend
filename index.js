@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-      origin:"http://localhost:5173",
+      origin: process.env.FRONTEND_URL || "http://localhost:5173",
       credentials:true
 }))
 app.use("/api/v1/media",mediaRoute)
@@ -32,7 +32,7 @@ app.use("/api/v1/course",courseRoute)
 app.use("/api/v1/purchase",purchaseRoute)
 app.use("/api/v1/progress",courseProgressRoute)
 
-app.listen(PORT,() => {
+app.listen(PORT,"0.0.0.0",() => {
       console.log(`server is listening at PORT:${PORT}`);
       
 })
