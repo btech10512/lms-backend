@@ -22,10 +22,31 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(cookieParser())
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // The one from Render Env
+  "https://lms-frontend-s3ac.vercel.app", // Your current Vercel URL
+  "https://lms-frontend-5p1p.vercel.app", // Your old Vercel URL
+  "http://localhost:5173"                 // Local testing
+];
+
 app.use(cors({
-      origin: process.env.FRONTEND_URL || "http://localhost:5173",
-      credentials:true
-}))
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if the origin is in our allowed list or matches a vercel.app domain
+    const isAllowed = allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use("/api/v1/media",mediaRoute)
 app.use("/api/v1/user",userRoute)
 app.use("/api/v1/course",courseRoute)
